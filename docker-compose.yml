@@ -1,35 +1,26 @@
 version: "3.7"
 services:
-  rabbit:
-    image: netsage/rabbitmq:3-management
-    env_file: .env
-    volumes:
-      - ./data/rabbit:/var/lib/rabbitmq
-    ports:
-      - "15672:15672"
-      - "5671:5671"
-      - "5672:5672"
-  importer:
-    image: netsage/pipeline_importer:latest
-    env_file: .env
-    depends_on:
-      - rabbit
-    restart: always
-    volumes:
-      - ./data:/data
-      - ./data/importer_cache:/var/cache/netsage
-    #      - ./userConfig/netsage_override.xml:/etc/grnoc/netsage/deidentifier/netsage_shared.xml
-    labels:
-      ofelia.enabled: "true"
-      ofelia.job-exec.dataUpdate.schedule: "@every 24h"
-      ofelia.job-exec.dataUpdate.command: "/tmp/docker_init.sh"
+  # importer:
+  #   image: netsage/pipeline_importer:latest
+  #   env_file: .env
+  #   external_links:
+  #     - rabbit
+  #   restart: always
+  #   volumes:
+  #     - ./data:/data
+  #     - ./data/importer_cache:/var/cache/netsage
+  #   #      - ./userConfig/netsage_override.xml:/etc/grnoc/netsage/deidentifier/netsage_shared.xml
+  #   labels:
+  #     ofelia.enabled: "true"
+  #     ofelia.job-exec.dataUpdate.schedule: "@every 24h"
+  #     ofelia.job-exec.dataUpdate.command: "/tmp/docker_init.sh"
   logstash:
     image: netsage/pipeline_logstash:latest
     env_file: .env
-    depends_on:
-      - importer
-    ports:
-      - "5044:5044"
+    external_links:
+      - rabbit
+    # ports:
+    #   - "5044:5044"
     volumes:
       - ./conf-logstash:/usr/share/logstash/pipeline/
       - ./data:/data
@@ -38,6 +29,6 @@ services:
     image: mcuadros/ofelia:v0.3.0
     command: daemon --docker
     depends_on:
-      - importer
+      - logstash
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
