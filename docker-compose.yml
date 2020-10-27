@@ -1,30 +1,18 @@
 version: "3.7"
 services:
-  # importer:
-  #   image: netsage/pipeline_importer:latest
-  #   env_file: .env
-  #   external_links:
-  #     - rabbit
-  #   restart: always
-  #   volumes:
-  #     - ./data:/data
-  #     - ./data/importer_cache:/var/cache/netsage
-  #   #      - ./userConfig/netsage_override.xml:/etc/grnoc/netsage/deidentifier/netsage_shared.xml
-  #   labels:
-  #     ofelia.enabled: "true"
-  #     ofelia.job-exec.dataUpdate.schedule: "@every 24h"
-  #     ofelia.job-exec.dataUpdate.command: "/tmp/docker_init.sh"
   logstash:
     image: netsage/pipeline_logstash:latest
     env_file: .env
     external_links:
       - rabbit
-    # ports:
-    #   - "5044:5044"
     volumes:
       - ./conf-logstash:/usr/share/logstash/pipeline/
       - ./data:/data
       - ./data/cache:/var/lib/grnoc/netsage/
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.dataUpdate.schedule: "@every 24h"
+      ofelia.job-exec.dataUpdate.command: "/tmp/docker_init.sh"
   ofelia: ## Scheduler Task
     image: mcuadros/ofelia:v0.3.0
     command: daemon --docker
