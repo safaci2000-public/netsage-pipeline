@@ -7,11 +7,10 @@ services:
     volumes:
       - ./data:/data
     healthcheck:
-      # I tried adding '&& exit 1',  '|| exit `' it doesn't work.
       test: bash -c "[ -f /tmp/health ]"
       interval: 10s
       timeout: 1s
-      retries: 20
+      retries: 3
     labels:
       ofelia.enabled: "true"
       ofelia.job-exec.dataUpdate.schedule: "@every 24h"
@@ -19,6 +18,8 @@ services:
   importer:
     image: netsage/pipeline_importer:latest
     env_file: .env
+    networks:
+      - netsage_pipeline
     depends_on:
       data_volume:
         condition: service_healthy
@@ -57,6 +58,11 @@ services:
       - "15672:15672"
       - "5671:5671"
       - "5672:5672"
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
   ofelia: ## Scheduler Task
     image: mcuadros/ofelia:v0.3.0
     command: daemon --docker
