@@ -4,13 +4,10 @@ services:
   ## Between Legacy and new collection patterns.
   data_volume:
     image: netsage/data_volume:latest
+    networks:
+      - netsage_pipeline
     volumes:
       - ./data:/data
-    healthcheck:
-      test: bash -c "[ -f /tmp/health ]"
-      interval: 10s
-      timeout: 1s
-      retries: 3
     labels:
       ofelia.enabled: "true"
       ofelia.job-exec.dataUpdate.schedule: "@every 24h"
@@ -21,10 +18,8 @@ services:
     networks:
       - netsage_pipeline
     depends_on:
-      data_volume:
-        condition: service_healthy
-      rabbit:
-        condition: service_healthy
+      - data_volume
+      - rabbit
     restart: always
     volumes:
       - ./data:/data
@@ -33,16 +28,10 @@ services:
     image: netsage/pipeline_logstash:latest
     networks:
       - netsage_pipeline
-    external_links:
-      - rabbit
     env_file: .env
-    # entrypoint: sleep
-    # command: "999999"
     depends_on:
-      data_volume:
-        condition: service_healthy
-      rabbit:
-        condition: service_healthy
+      - data_volume
+      - rabbit
     volumes:
       - ./conf-logstash:/usr/share/logstash/pipeline/
       - ./data:/data

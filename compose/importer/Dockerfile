@@ -35,7 +35,7 @@ RUN  \
     rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch  && \
     yum  -y update && \ 
     yum install -y  dnf epel-release  && \
-    yum install -y python-pip nfdump wget && \
+    yum install -y python-pip nfdump nc wget && \
     dnf install -y /tmp/*.rpm  && \
     pip install --upgrade pip pika && \
     yum clean all && \
