@@ -123,6 +123,9 @@ Naturally the hosts for rabbit and elastic will need to be updated accordingly.
 
 Note: This should be updated to use a mapping template, for setting field types, and possibly using es_doc_id as the elasticsearch document id. As of Nov 2020, we are moving toward saving all fields as type "keyword", "float", or "long" only. 
 
+
+<details><summary>Example Configuration</summary>
+
 ```
 input {
   rabbitmq {
@@ -162,6 +165,9 @@ output {
     }
 }
 ```
+
+</details>
+
 
 ## Field names
 
